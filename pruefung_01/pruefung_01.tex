@@ -1,0 +1,485 @@
+% Prüfung I - Modul 295 (Lektionen 01 bis 07)
+%
+% Prüfung:      pdflatex -interaction=nonstopmode pruefung_01.tex
+% Musterlösung: pdflatex -interaction=nonstopmode -jobname=pruefung_01_loesung "\def\withsolution{}\input{pruefung_01.tex}"
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[ngerman]{babel}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{amssymb}
+
+\setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{3em}
+
+% ---------- Lösung ein-/ausblenden ----------
+\newif\ifsolution
+\ifdefined\withsolution \solutiontrue \else \solutionfalse \fi
+
+\definecolor{sol}{RGB}{190,0,0}
+
+% \antwort{Anzahl Linien}{Musterlösung}
+\newcommand{\antwort}[2]{%
+  \ifsolution
+    \par\smallskip{\color{sol}\textbf{Lösung:} #2}\par\medskip
+  \else
+    \par\vspace{0.3cm}%
+    \answerlines{#1}%
+  \fi}
+\newcount\linecount
+\newcommand{\answerlines}[1]{%
+  \linecount=0
+  \loop\ifnum\linecount<#1
+    \vspace{0.75cm}\noindent\rule{\linewidth}{0.4pt}\par
+    \advance\linecount by 1
+  \repeat\par\medskip}
+
+
+% Seitenumbruch, falls weniger als #1 Platz übrig ist (wie needspace.sty)
+\makeatletter
+\newcommand{\needspace}[1]{\par\penalty-100\begingroup
+  \setlength{\dimen@}{#1}%
+  \vskip\z@\@plus\dimen@\penalty-100\vskip\z@\@plus-\dimen@
+  \vskip\dimen@\penalty9999\vskip-\dimen@\vskip\z@skip\endgroup}
+\makeatother
+
+\newcommand{\pt}[1]{\hfill\textbf{(#1p)}}
+
+% ---------- Code ----------
+\lstdefinestyle{php}{
+  language=PHP,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape\color{gray},
+  stringstyle=\color{black},
+  showstringspaces=false,
+  frame=single,
+  framerule=0.4pt,
+  rulecolor=\color{gray},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  columns=fullflexible,
+  keepspaces=true,
+  literate={ä}{{\"a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+}
+\lstset{style=php}
+\lstdefinestyle{phpsol}{style=php, basicstyle=\ttfamily\small\color{sol}, rulecolor=\color{sol}}
+
+% ---------- Kopf-/Fusszeile ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[L]{Lukas Meier}
+\fancyfoot[C]{Modul 295}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+
+\begin{document}
+
+% ================= Deckblatt =================
+\thispagestyle{fancy}
+{\LARGE\textbf{Prüfung I - Modul 295}\ifsolution\ {\color{sol}(Musterlösung)}\fi}\\[4pt]
+{\large Backend für Applikationen realisieren}\\[4pt]
+Dienstag, 27. Oktober 2026
+
+\vspace{1.2cm}
+
+Name:\\[0.6cm]\rule{\linewidth}{0.4pt}
+
+\vspace{0.6cm}
+Klasse:\\[0.6cm]\rule{\linewidth}{0.4pt}
+
+\vspace{0.6cm}
+Punkte (von 71):
+
+\vspace{0.3cm}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabularx}{\linewidth}{|l|*{7}{>{\centering\arraybackslash}X|}c|}
+\hline
+Aufgabe & A1 & A2 & A3 & A4 & A5 & A6 & A7 & Total \\ \hline
+Max.    & 15 & 8  & 9  & 7  & 17 & 10 & 5  & 71 \\ \hline
+Erreicht &   &    &    &    &    &    &    &    \\ \hline
+\end{tabularx}
+\renewcommand{\arraystretch}{1}
+
+\vspace{0.8cm}
+Note:\\[0.6cm]\rule{\linewidth}{0.4pt}
+
+\vspace{1.2cm}
+\textbf{Hinweise}
+\begin{itemize}
+  \item Hilfsmittel: keine. Schreiben Sie Ihre Antworten direkt auf die Prüfungsblätter.
+  \item Die Aufgaben sind unabhängig voneinander und können in beliebiger Reihenfolge gelöst werden.
+  \item Antworten Sie kurz und präzise. Stichworte genügen, sofern die Aussage klar ist.
+  \item Bei Code, den Sie selbst schreiben, gibt es für kleine Syntaxfehler (z.B. ein fehlendes Semikolon) keinen Abzug.
+\end{itemize}
+
+\newpage
+
+% ================= A1 =================
+\section{Grundlagen, Datentypen und Operatoren (15p)}
+
+\subsection*{1.1 \normalsize\mdseries PHP wird \emph{serverseitig} ausgeführt. Was bedeutet das, und was erhält der Browser vom Server zurück? \pt{2}}
+\antwort{3}{Der PHP-Code wird auf dem Webserver ausgeführt, nicht im Browser. Der Browser erhält nur das Ergebnis, also fertiges HTML (ggf. mit CSS/JS). Den PHP-Quellcode sieht er nie. (1p Ausführung auf Server, 1p Browser erhält HTML)}
+
+\subsection*{1.2 \normalsize\mdseries Wofür wird XAMPP benötigt? In welchem Ordner müssen die PHP-Dateien liegen, und wie ruft man ein Projekt \texttt{shop} danach im Browser auf? \pt{2}}
+\antwort{3}{XAMPP liefert einen lokalen Webserver (Apache) mit PHP (und MySQL/MariaDB), damit PHP-Dateien ausgeführt werden können (1p). Dateien liegen im Ordner \texttt{htdocs}, Aufruf über \texttt{http://localhost/shop/} (1p).}
+
+\subsection*{1.3 \normalsize\mdseries Nennen Sie die vier skalaren Datentypen von PHP mit je einem Beispielwert. \pt{2}}
+\antwort{2}{\texttt{string} (\texttt{"Hallo"}), \texttt{int} (\texttt{24}), \texttt{float} (\texttt{19.95}), \texttt{bool} (\texttt{true}). Je ½p.}
+
+\subsection*{1.4 \normalsize\mdseries Erklären Sie den Unterschied zwischen \emph{Type Juggling} und \emph{Type Casting}. Geben Sie zu beidem ein kurzes Beispiel. \pt{2}}
+\antwort{4}{Type Juggling: PHP wandelt Typen bei Bedarf \emph{automatisch} um, z.B. \texttt{"10" + 5} ergibt \texttt{int(15)} (1p). Type Casting: Man wandelt einen Wert \emph{gezielt selbst} um, z.B. \texttt{(int) "42"} (1p).}
+
+\subsection*{1.5 \normalsize\mdseries Ergibt der Wert bei der Umwandlung in \texttt{bool} den Wert \texttt{true} oder \texttt{false}? Kreuzen Sie an. \pt{3}}
+\medskip
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Wert} & \textbf{true} & \textbf{false} \\ \hline
+\texttt{"0"}      & \hspace{1cm} & \ifsolution{\color{sol}X}\fi \hspace{1cm} \\ \hline
+\texttt{"false"}  & \ifsolution{\color{sol}X}\fi & \\ \hline
+\texttt{" "} (ein Leerzeichen) & \ifsolution{\color{sol}X}\fi & \\ \hline
+\texttt{[]}       & & \ifsolution{\color{sol}X}\fi \\ \hline
+\texttt{-1}       & \ifsolution{\color{sol}X}\fi & \\ \hline
+\texttt{null}     & & \ifsolution{\color{sol}X}\fi \\ \hline
+\end{tabular}
+\renewcommand{\arraystretch}{1}
+\ifsolution\par{\color{sol}Je ½p.}\fi
+
+\subsection*{1.6 \normalsize\mdseries Was ist der Unterschied zwischen \texttt{==} und \texttt{===}? Welchen der beiden Operatoren sollte man in der Regel verwenden, und weshalb? \pt{2}}
+\antwort{3}{\texttt{==} vergleicht nur den Wert (mit Type Juggling), \texttt{===} vergleicht Wert \emph{und} Typ (1p). Man sollte \texttt{===} verwenden, um unerwartete Ergebnisse durch Type Juggling zu vermeiden (1p).}
+
+\subsection*{1.7 \normalsize\mdseries Was ist eine Konstante, und wie unterscheidet sie sich von einer Variable? Nennen Sie zwei Arten, eine Konstante zu definieren. \pt{2}}
+\antwort{3}{Eine Konstante speichert einen Wert, der sich zur Laufzeit nicht mehr ändern lässt; sie hat kein \texttt{\$} vor dem Namen (1p). Definition mit \texttt{define("VAT", 0.077);} oder \texttt{const VAT = 0.077;} (1p).}
+
+% ================= A2 =================
+\section{Arrays, Schleifen und Funktionen (8p)}
+
+\subsection*{2.1 \normalsize\mdseries Was ist der Unterschied zwischen einem indizierten und einem assoziativen Array? Schreiben Sie zu beiden ein kurzes Beispiel. \pt{2}}
+\antwort{4}{Indiziert: PHP vergibt die Schlüssel automatisch ab 0, z.B. \texttt{["Apfel", "Birne"]} (1p). Assoziativ: Die Schlüssel werden selbst definiert (meist Strings), z.B. \texttt{["name" => "Anna", "age" => 23]} (1p).}
+
+\subsection*{2.2 \normalsize\mdseries Was ist der Unterschied zwischen einer \texttt{while}- und einer \texttt{do-while}-Schleife? \pt{2}}
+\antwort{3}{Bei \texttt{while} wird die Bedingung \emph{vor} jedem Durchlauf geprüft; ist sie von Anfang an \texttt{false}, läuft die Schleife nie (1p). Bei \texttt{do-while} wird sie erst \emph{nach} dem Durchlauf geprüft, die Schleife läuft also mindestens einmal (1p).}
+
+\subsection*{2.3 \normalsize\mdseries Was ist der Unterschied, ob eine Funktion ein Ergebnis mit \texttt{echo} ausgibt oder mit \texttt{return} zurückgibt? \pt{2}}
+\antwort{3}{\texttt{echo} schreibt den Wert nur in die Ausgabe, danach steht er im Programm nicht mehr zur Verfügung (1p). \texttt{return} gibt den Wert an die Aufrufstelle zurück, wo er weiterverwendet werden kann (z.B. in einer Variable); zudem beendet \texttt{return} die Funktion (1p).}
+
+\subsection*{2.4 \normalsize\mdseries Was versteht man unter dem \emph{Gültigkeitsbereich} (Scope) einer Variable in einer Funktion? Wie gelangt ein Wert von ausserhalb am besten in eine Funktion hinein? \pt{2}}
+\antwort{3}{Variablen innerhalb einer Funktion sind lokal und existieren nur dort; Variablen von ausserhalb sind in der Funktion nicht sichtbar (1p). Am besten übergibt man den Wert als Parameter (und gibt das Ergebnis mit \texttt{return} zurück); \texttt{global} ist möglich, aber zu vermeiden (1p).}
+
+% ================= A3 =================
+\section{Klassen (9p)}
+
+\subsection*{3.1 \normalsize\mdseries Erklären Sie den Unterschied zwischen einer Klasse und einem Objekt. \pt{2}}
+\antwort{3}{Eine Klasse ist ein Bauplan, der festlegt, welche Eigenschaften und Methoden ein Objekt hat (1p). Ein Objekt ist eine konkrete Instanz, die mit \texttt{new} nach diesem Bauplan erzeugt wird; es gibt beliebig viele, unabhängige Objekte (1p).}
+
+\subsection*{3.2 \normalsize\mdseries Von wo ist eine Eigenschaft mit der jeweiligen Sichtbarkeit zugreifbar? Kreuzen Sie alle zutreffenden Felder an. \pt{3}}
+\medskip
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|l|c|c|c|}
+\hline
+ & \textbf{eigene Klasse} & \textbf{abgeleitete Klasse} & \textbf{von aussen} \\ \hline
+\texttt{public}    & \ifsolution{\color{sol}X}\fi & \ifsolution{\color{sol}X}\fi & \ifsolution{\color{sol}X}\fi \\ \hline
+\texttt{protected} & \ifsolution{\color{sol}X}\fi & \ifsolution{\color{sol}X}\fi & \\ \hline
+\texttt{private}   & \ifsolution{\color{sol}X}\fi & & \\ \hline
+\end{tabular}
+\renewcommand{\arraystretch}{1}
+\ifsolution\par{\color{sol}1p pro korrekte Zeile.}\fi
+
+\subsection*{3.3 \normalsize\mdseries Wozu verwendet man Getter und Setter? Welchen Vorteil hat ein Setter gegenüber einer \texttt{public}-Eigenschaft? \pt{2}}
+\antwort{3}{Getter/Setter sind öffentliche Methoden, über die man \texttt{private}-Eigenschaften lesen bzw. ändern kann (Kapselung) (1p). Ein Setter kann den Wert vor dem Übernehmen prüfen und ungültige Werte (z.B. negativen Preis) ablehnen (1p).}
+
+\subsection*{3.4 \normalsize\mdseries Was ist der Unterschied zwischen einer abstrakten Klasse und einem Interface? \pt{2}}
+\antwort{4}{Eine abstrakte Klasse kann nicht mit \texttt{new} erzeugt werden, kann aber neben abstrakten Methoden auch fertige Methoden (und Eigenschaften) enthalten, die vererbt werden; man erbt mit \texttt{extends} (1p). Ein Interface schreibt nur vor, welche Methoden eine Klasse haben muss, ohne Umsetzung; es wird mit \texttt{implements} umgesetzt, und eine Klasse kann zusätzlich von einer Klasse erben (1p).}
+
+% ================= A4 =================
+\section{Sessions (7p)}
+
+\subsection*{4.1 \normalsize\mdseries HTTP ist \emph{zustandslos}. Was bedeutet das, und welches Problem entsteht dadurch z.B. bei einem Login? \pt{2}}
+\antwort{3}{Jeder Request ist unabhängig, der Server erinnert sich nicht an frühere Requests; Variablen existieren nur während eines Requests (1p). Ohne Sessions wäre z.B. der Login-Status beim nächsten Seitenaufruf wieder weg (1p).}
+
+\subsection*{4.2 \normalsize\mdseries Erklären Sie, wie Session-ID, Cookie und Server zusammenspielen, damit der Server einen Besucher wiedererkennt. Wo liegen die Session-Daten? \pt{3}}
+\antwort{4}{\texttt{session\_start()} erzeugt beim ersten Besuch eine eindeutige Session-ID und schickt sie als Cookie (\texttt{PHPSESSID}) an den Browser (1p). Der Browser sendet das Cookie bei jedem weiteren Request automatisch mit, und PHP findet anhand der ID die passenden Daten wieder (1p). Die Daten selbst liegen auf dem Server, im Cookie steht nur die ID (1p).}
+
+\subsection*{4.3 \normalsize\mdseries Worin unterscheiden sich \texttt{session\_destroy()} und \texttt{unset(\$\_SESSION["cart"])}? \pt{2}}
+\antwort{2}{\texttt{session\_destroy()} löscht alle Daten der Session auf dem Server, z.B. beim Logout (1p). \texttt{unset(\$\_SESSION["cart"])} entfernt nur diesen einen Wert, alle anderen Session-Daten bleiben erhalten (1p).}
+
+% ================= A5 =================
+\newpage
+\section{Code verstehen (17p)}
+
+Was gibt der Code jeweils aus? Alle Code-Ausschnitte sind vollständig und funktionieren unabhängig voneinander.
+
+\needspace{5.5cm}
+\subsection*{5.1 \pt{2}}
+\begin{lstlisting}
+<?php
+var_dump("10" + 4);
+var_dump("10" . 4);
+var_dump("10" == 10);
+var_dump("10" === 10);
+\end{lstlisting}
+\antwort{2}{\texttt{int(14)}, \texttt{string(3) "104"}, \texttt{bool(true)}, \texttt{bool(false)}. Je ½p (Typ muss stimmen).}
+
+\needspace{5.5cm}
+\subsection*{5.2 \pt{2}}
+\begin{lstlisting}
+<?php
+$x = 4;
+$x *= 2 + 1;
+$x %= 5;
+echo $x ** 3;
+\end{lstlisting}
+\antwort{1}{\texttt{8}. (\texttt{\$x = 4 * 3 = 12}, \texttt{12 \% 5 = 2}, \texttt{2 ** 3 = 8}; 1p Zwischenschritt \texttt{12} bzw. \texttt{2})}
+
+\needspace{11.0cm}
+\subsection*{5.3 \pt{2}}
+\begin{lstlisting}
+<?php
+$level = "silber";
+$discount = 0;
+switch ($level) {
+    case "gold":
+        $discount += 20;
+        break;
+    case "silber":
+        $discount += 10;
+    case "bronze":
+        $discount += 5;
+        break;
+    default:
+        $discount = 0;
+}
+echo $discount;
+\end{lstlisting}
+\antwort{1}{\texttt{15}. Bei \texttt{"silber"} fehlt das \texttt{break}, die Ausführung fällt in \texttt{"bronze"} (Fallthrough). 2p nur für \texttt{15}.}
+
+\needspace{9.0cm}
+\subsection*{5.4 \pt{2}}
+\begin{lstlisting}
+<?php
+$sum = 0;
+for ($i = 1; $i <= 10; $i++) {
+    if ($i % 3 == 0) {
+        continue;
+    }
+    if ($sum > 10) {
+        break;
+    }
+    $sum += $i;
+}
+echo $sum;
+\end{lstlisting}
+\antwort{1}{\texttt{12}. (1 + 2 + 4 + 5; 3 und 6 werden übersprungen, bei \texttt{\$i = 7} ist \texttt{\$sum > 10} und die Schleife bricht ab)}
+
+\needspace{6.0cm}
+\subsection*{5.5 \pt{2}}
+\begin{lstlisting}
+<?php
+$prices = ["Apfel" => 0.5, "Brot" => 3.2, "Käse" => 7.9];
+$prices["Milch"] = 1.6;
+unset($prices["Apfel"]);
+$expensive = array_filter($prices, fn($p) => $p > 2);
+echo count($prices) . " " . count($expensive);
+\end{lstlisting}
+\antwort{1}{\texttt{3 2}. (Brot, Käse, Milch; davon über 2: Brot, Käse. Je 1p)}
+
+\needspace{11.0cm}
+\subsection*{5.6 \pt{2}}
+\begin{lstlisting}
+<?php
+$total = 10;
+
+function setTotal($n) {
+    $total = $n;
+    return $total;
+}
+
+function addFive(&$n) {
+    $n += 5;
+}
+
+setTotal(99);
+echo $total . " ";
+addFive($total);
+echo $total;
+\end{lstlisting}
+\antwort{1}{\texttt{10 15}. \texttt{setTotal()} ändert nur eine lokale Variable (Scope), \texttt{addFive()} erhält eine Referenz und ändert das Original. Je 1p.}
+
+\needspace{14.5cm}
+\subsection*{5.7 \pt{3}}
+\begin{lstlisting}
+<?php
+class Ticket {
+    private static int $next = 1;
+    public int $nr;
+
+    public function __construct(public string $type = "Normal") {
+        $this->nr = self::$next++;
+    }
+
+    public function label(): string {
+        return $this->type . " #" . $this->nr;
+    }
+}
+
+class VipTicket extends Ticket {
+    public function label(): string {
+        return "VIP " . parent::label();
+    }
+}
+
+$a = new Ticket();
+$b = new VipTicket("Gold");
+echo $a->label() . " / " . $b->label();
+\end{lstlisting}
+\antwort{1}{\texttt{Normal \#1 / VIP Gold \#2}. 1p \texttt{Normal \#1} (Default-Wert), 1p \texttt{\#2} (statischer Zähler wird von allen Objekten geteilt, auch von der Kindklasse), 1p \texttt{VIP Gold} (überschriebene Methode mit \texttt{parent::}).}
+
+\needspace{8.0cm}
+\subsection*{5.8 \normalsize\mdseries Die folgende Seite wird im selben Browser viermal nacheinander aufgerufen. Was wird bei jedem Aufruf ausgegeben? \pt{2}}
+\begin{lstlisting}
+<?php
+session_start();
+$_SESSION["visits"] = ($_SESSION["visits"] ?? 0) + 1;
+
+if ($_SESSION["visits"] >= 3) {
+    echo "Stammgast";
+    unset($_SESSION["visits"]);
+} else {
+    echo $_SESSION["visits"];
+}
+\end{lstlisting}
+\ifsolution
+  \antwort{0}{1. Aufruf: \texttt{1}, 2. Aufruf: \texttt{2}, 3. Aufruf: \texttt{Stammgast}, 4. Aufruf: \texttt{1} (\texttt{unset()} hat den Zähler entfernt). Je ½p.}
+\else
+  \medskip
+  1. Aufruf: \rule{4.5cm}{0.4pt}\hspace{1cm} 2. Aufruf: \rule{4.5cm}{0.4pt}
+
+  \vspace{0.6cm}
+  3. Aufruf: \rule{4.5cm}{0.4pt}\hspace{1cm} 4. Aufruf: \rule{4.5cm}{0.4pt}
+\fi
+
+% ================= A6 =================
+\newpage
+\section{Fehler finden (10p)}
+
+Jeder der folgenden Code-Ausschnitte enthält einen Fehler: Er funktioniert nicht oder macht nicht das, was der Kommentar verlangt. Beschreiben Sie den Fehler und wie man ihn behebt. (je 2p: 1p Fehler, 1p Korrektur)
+
+\needspace{4.5cm}
+\subsection*{6.1}
+\begin{lstlisting}
+<?php
+$name = "Anna";
+echo 'Hallo $name!'; // soll "Hallo Anna!" ausgeben
+\end{lstlisting}
+\antwort{2}{In einfachen Anführungszeichen werden Variablen nicht ersetzt, ausgegeben wird \texttt{Hallo \$name!}. Korrektur: doppelte Anführungszeichen \texttt{"Hallo \$name!"} oder Konkatenation \texttt{'Hallo ' . \$name . '!'}.}
+
+\needspace{5.5cm}
+\subsection*{6.2}
+\begin{lstlisting}
+<?php
+function greet($greeting = "Hallo", $name) {
+    return $greeting . " " . $name;
+}
+echo greet("Anna"); // soll "Hallo Anna" ausgeben
+\end{lstlisting}
+\antwort{2}{Der optionale Parameter steht vor dem Pflichtparameter. \texttt{"Anna"} wird \texttt{\$greeting} zugeordnet, für \texttt{\$name} fehlt ein Argument (Fehler). Korrektur: \texttt{function greet(\$name, \$greeting = "Hallo")}.}
+
+\needspace{6.0cm}
+\subsection*{6.3}
+\begin{lstlisting}
+<?php
+// soll die Zahlen 1 bis 5 ausgeben
+$i = 1;
+while ($i <= 5) {
+    echo $i;
+}
+\end{lstlisting}
+\antwort{2}{\texttt{\$i} wird nie erhöht, die Bedingung bleibt immer \texttt{true}: Endlosschleife. Korrektur: \texttt{\$i++;} in der Schleife ergänzen.}
+
+\needspace{8.0cm}
+\subsection*{6.4}
+\begin{lstlisting}
+<?php
+class Product {
+    public function __construct(
+        public string $name,
+        private float $price
+    ) {}
+}
+
+$apple = new Product("Apfel", 0.5);
+echo $apple->price; // soll den Preis ausgeben
+\end{lstlisting}
+\antwort{2}{\texttt{\$price} ist \texttt{private} und von aussen nicht zugreifbar (Fehler). Korrektur: Getter \texttt{getPrice(): float \{ return \$this->price; \}} ergänzen und \texttt{\$apple->getPrice()} aufrufen (oder \texttt{public} verwenden).}
+
+\needspace{5.0cm}
+\subsection*{6.5}
+\begin{lstlisting}
+<?php
+echo "<h1>Willkommen</h1>";
+session_start();
+$_SESSION["username"] = "Anna"; // soll gespeichert werden
+\end{lstlisting}
+\antwort{2}{\texttt{session\_start()} wird erst nach einer Ausgabe aufgerufen; es muss aber vor jeder Ausgabe stehen (sonst kann das Session-Cookie nicht mehr gesendet werden). Korrektur: \texttt{session\_start()} ganz an den Anfang des Skripts.}
+
+% ================= A7 =================
+\newpage
+\section{Code schreiben (5p)}
+
+\needspace{10.0cm}
+\subsection*{7.1 \normalsize\mdseries Schreiben Sie die beiden Codeblöcke jeweils als eine einzige Zeile: den ersten mit dem Null-Coalescing-Operator \texttt{??}, den zweiten mit dem ternären Operator \texttt{?:}. \pt{2}}
+\begin{lstlisting}
+<?php
+if (isset($_GET["lang"])) {
+    $lang = $_GET["lang"];
+} else {
+    $lang = "de";
+}
+
+if ($age >= 18) {
+    $status = "volljährig";
+} else {
+    $status = "minderjährig";
+}
+\end{lstlisting}
+\ifsolution
+\begin{lstlisting}[style=phpsol]
+$lang = $_GET["lang"] ?? "de";
+$status = $age >= 18 ? "volljährig" : "minderjährig";
+\end{lstlisting}
+{\color{sol}Je 1p.}
+\else
+\par\vspace{2.5cm}\par
+\fi
+
+\needspace{8.5cm}
+\subsection*{7.2 \normalsize\mdseries Schreiben Sie eine Funktion \texttt{countPassed(array \$grades): int}, welche die Anzahl genügender Noten (Note \texttt{>= 4}) im Array zurückgibt. \pt{3}}
+Beispiel: \texttt{countPassed([4.5, 3.5, 6, 4])} gibt \texttt{3} zurück.
+\ifsolution
+\begin{lstlisting}[style=phpsol]
+function countPassed(array $grades): int {
+    $count = 0;
+    foreach ($grades as $grade) {
+        if ($grade >= 4) {
+            $count++;
+        }
+    }
+    return $count;
+}
+\end{lstlisting}
+{\color{sol}1p Schleife über das Array, 1p Bedingung und Zähler, 1p \texttt{return}. Auch \texttt{count(array\_filter(\$grades, fn(\$g) => \$g >= 4))} ist korrekt.}
+\else
+\par\vspace{6cm}\par
+\fi
+
+
+\end{document}
